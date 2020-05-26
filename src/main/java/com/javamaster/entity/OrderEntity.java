@@ -15,8 +15,4 @@ public class OrderEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
-
-    @ManyToOne
-    @JoinColumn(name = "purchase_item_id")
-    private PurchaseItemEntity purchaseItemEntity;
 }

@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -31,8 +32,9 @@ public class PurchaseServiceImpl implements PurchaseService {
                 request.getPhone(), request.getEmail(), request.getAddress()));
         orderEntity.setComment(request.getComment());
         orderEntity = orderEntityRepository.save(orderEntity);
+        Map<Integer, Integer> productIdProductCount = getProductIdProductCountMap(request);
 
-        for (Map.Entry<Integer, Integer> entry : request.getProductIdProductCount().entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : productIdProductCount.entrySet()) {
             Integer k = entry.getKey();
             Integer v = entry.getValue();
             ProductEntity productEntity = productService.findById(k);
@@ -43,5 +45,19 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseItemEntityRepository.save(p);
         }
         return orderEntity.getId();
+    }
+
+    private Map<Integer, Integer> getProductIdProductCountMap(FinishPurchaseRequest request) {
+        Map<Integer, Integer> productIdProductCount = new HashMap<>();
+        request.getProductIds().forEach(it -> {
+            if (productIdProductCount.containsKey(it.getId())) {
+                Integer productCount = productIdProductCount.get(it.getId());
+                productCount = productCount + 1;
+                productIdProductCount.put(it.getId(), productCount);
+            } else {
+                productIdProductCount.put(it.getId(), 1);
+            }
+        });
+        return productIdProductCount;
     }
 }

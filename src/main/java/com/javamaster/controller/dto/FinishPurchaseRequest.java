@@ -1,16 +1,17 @@
 package com.javamaster.controller.dto;
 
+import com.javamaster.entity.ProductEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Map;
+import java.util.List;
 
 @Data
 public class FinishPurchaseRequest {
 
     @NotNull
-    private Map<Integer, Integer> productIdProductCount;
+    private List<ProductEntity> productIds;
     @NotEmpty
     private String userName;
     private String userSurname;

@@ -4,6 +4,7 @@ import com.javamaster.controller.dto.FinishPurchaseRequest;
 import com.javamaster.entity.OrderEntity;
 import com.javamaster.entity.ProductEntity;
 import com.javamaster.entity.PurchaseItemEntity;
+import com.javamaster.entity.UserEntity;
 import com.javamaster.repository.OrderEntityRepository;
 import com.javamaster.repository.PurchaseItemEntityRepository;
 import lombok.AllArgsConstructor;
@@ -28,8 +29,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     public Integer finishPurchase(FinishPurchaseRequest request) {
         log.info("creating order entity from request: {}", request);
         OrderEntity orderEntity = new OrderEntity();
-        orderEntity.setUserEntity(userService.findOrCreateUser(request.getUserName(), request.getUserSurname(),
-                request.getPhone(), request.getEmail(), request.getAddress()));
+        UserEntity userEntity = userService.findOrCreateUser(request.getUserName(), request.getUserSurname(),
+                request.getPhone(), request.getEmail(), request.getAddress());
+        orderEntity.setUserEntity(userEntity);
         orderEntity.setComment(request.getComment());
         orderEntity = orderEntityRepository.save(orderEntity);
         Map<Integer, Integer> productIdProductCount = getProductIdProductCountMap(request);
@@ -43,6 +45,10 @@ public class PurchaseServiceImpl implements PurchaseService {
             p.setCount(v);
             p.setOrderEntity(orderEntity);
             purchaseItemEntityRepository.save(p);
+        }
+
+        if (request.getPassword() != null && request.getPassword().length() > 1) {
+            userService.setPassword(userEntity.getId(), request.getPassword());
         }
         return orderEntity.getId();
     }
